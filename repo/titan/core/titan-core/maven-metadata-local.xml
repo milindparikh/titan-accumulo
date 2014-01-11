@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>titan.core</groupId>
+  <artifactId>titan-core</artifactId>
+  <versioning>
+    <release>0.4.1</release>
+    <versions>
+      <version>0.4.1</version>
+    </versions>
+    <lastUpdated>20131231213649</lastUpdated>
+  </versioning>
+</metadata>
