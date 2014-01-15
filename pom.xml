@@ -2,6 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 
+    <properties>
+        <titan.compatible.versions>0.4.0,0.4.1</titan.compatible.versions>
+        <tinkerpop.version>2.4.0</tinkerpop.version>
+    </properties>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>milindparikh</groupId>
   <artifactId>titan-accumulo</artifactId>
@@ -20,6 +25,85 @@
   </repositories> 
 
   <dependencies>
+
+        <!-- TinkerPop -->
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-core</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.gremlin</groupId>
+            <artifactId>gremlin-groovy</artifactId>
+            <version>${tinkerpop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>gossip</artifactId>
+                    <groupId>org.sonatype.gossip</groupId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>frames</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+            <version>2.21</version>
+            <classifier>shaded</classifier>
+            
+            <!--
+            http://code.google.com/p/kryo/wiki/MavenShadedJAR
+            
+            Kryo normally depends on classes in these artifacts. The Kryo artifact 
+            with the shaded classifier includes all the classes on which Kryo depends. 
+            The shaded dependency classes also undergo bytecode rewriting to prefix their 
+            normal packagenames with com.esotericsoftware. This appears to be recursive. 
+            For example, kryo depends on reflectasm depends on asm (4.0). The normal 
+            asm packagename is rewritten from
+            org.ow2.asm to com.esotericsoftware.reflectasm.shaded.org.objectweb.asm.
+            
+            Bottom line: these exclusions are harmless, because shaded kyro comes with
+            its own copy of these deps and wouldn't use them anyway.
+            -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.esotericsoftware.reflectasm</groupId>
+                    <artifactId>reflectasm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.esotericsoftware.minlog</groupId>
+                    <artifactId>minlog</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.objenesis</groupId>
+                    <artifactId>objenesis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.spatial4j</groupId>
+            <artifactId>spatial4j</artifactId>
+            <version>0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>0.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.high-scale-lib</groupId>
+            <artifactId>high-scale-lib</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+
     <dependency>
       <groupId>hadoop.client</groupId>
       <artifactId>hadoop-client</artifactId>
