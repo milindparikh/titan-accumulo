@@ -360,11 +360,11 @@
       <artifactId>hadoop-capacity-scheduler</artifactId>
       <version>1.2.1</version>
     </dependency>
-    <dependency>
+     <dependency>
       <groupId>titan.core</groupId>
       <artifactId>titan-core</artifactId>
       <version>0.4.1</version>
-    </dependency>
+    </dependency>  
     <dependency>
 		<groupId>org.apache.commons</groupId>
 		<artifactId>commons-pool2</artifactId>
@@ -382,9 +382,19 @@
                 <artifactId>onejar-maven-plugin</artifactId>
                 <version>1.4.4</version>
             </plugin>
+            <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-compiler-plugin</artifactId>
+        		<version>3.1</version>
+        		<configuration>
+          			<source>1.7</source>
+          			<target>1.7</target>
+        			</configuration>
+      		</plugin>    
         </plugins>
+        
     </build>
-
+    
     <pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
