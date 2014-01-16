@@ -28,7 +28,7 @@ public class App
     public static void main( String[] args )
     {
         
- 	System.out.println( "Hello World!" );
+
         
 	configureGraph();
 	createNodesAndEdges();
@@ -39,7 +39,7 @@ public class App
 
     static void createNodesAndEdges(){
 
-    	System.out.println("Creating Nodes and Edges...");
+
 
     	Vertex juno = graph.addVertex(null);
 
@@ -83,11 +83,11 @@ public class App
 	*/
 
     	graph.commit();
-    	System.out.println("Created Nodes and Edges...");
+
     }
     
     static void retrieveNodes(){
-    	System.out.println("Retrieving Nodes");
+
     	for(Vertex vertex: graph.getVertices()){
     		System.out.println("Vertex:" + vertex.getProperty("name"));
 
@@ -113,19 +113,11 @@ public class App
 	System.out.println("Configuring Graph...");
 
     	 Configuration conf = new BaseConfiguration();
-
          conf.setProperty("storage.backend","milindparikh.diskstorage.accumulo.java.AccumuloJavaStoreManager");
-
          conf.setProperty("storage.instance","test");
          conf.setProperty("storage.user","root");
          conf.setProperty("storage.password","root");
          conf.setProperty("ids.password","root");
-	 
-
-
-
-
-
          graph = TitanFactory.open(conf);
 
          System.out.println("Configure Graph....");

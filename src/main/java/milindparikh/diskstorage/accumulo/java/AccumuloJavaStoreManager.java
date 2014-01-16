@@ -25,6 +25,9 @@ public class AccumuloJavaStoreManager extends AbstractAccumuloStoreManager {
 
 	public AccumuloJavaStoreManager(Configuration storageConfig) {
 		super(storageConfig);
+		System.out.println("OK. we are in this AccumuloJavaStoreManager");
+		System.out.println(storageConfig);
+		
 		openStores = new HashMap<String, AccumuloJavaOrderedKeyColumnValueStore>(
 				8);
 
