@@ -79,7 +79,7 @@ public abstract class AbstractAccumuloStoreManager extends
 			features.supportsTransactions = false;
 
 			// ** what is this
-			features.supportsConsistentKeyOperations = false;
+			features.supportsConsistentKeyOperations = true;
 
 			features.supportsLocking = false;
 			features.isKeyOrdered = true;

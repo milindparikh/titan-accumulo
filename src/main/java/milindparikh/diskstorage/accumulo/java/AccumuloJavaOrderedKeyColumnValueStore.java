@@ -43,7 +43,9 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 	@Override
 	public String getName() {
-		return tableName;
+	    System.out.println("Calling getName on " +tableName);
+	    
+	    return tableName;
 	}
 
 	@Override
@@ -60,8 +62,15 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
+
+		    
+		    /*
 			String startKey = new String(key.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
+		    */
+		    String startKey = new String(key.asByteBuffer().array());
+		    System.out.println("Calling get with " + tableName + "(" + startKey + ")");
+		    
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 			Scanner scanner = connector.createScanner(tableName,
@@ -105,9 +114,13 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 		AccumuloConnector accumuloConnector = null;
 
 		try {
-
+		    /*
 			String startKey = new String(key.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
+
+		    */
+		    String startKey = new String(key.asByteBuffer().array());
+		    
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 			Scanner scanner = connector.createScanner(tableName,
@@ -164,10 +177,22 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
+
+
+		    /*
 			String startKey = new String(keyStart.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
 			String endKey = new String(keyEnd.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
+		    */
+
+
+		    String startKey = new String(keyStart.asByteBuffer().array());
+		    System.out.println("Calling getslice with " + tableName + "(" + startKey + ")");
+		    String endKey = new String(keyEnd.asByteBuffer().array());
+			System.out.println("Start key = "+startKey);
+			System.out.println("End key = "+ endKey);
+			
 
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
@@ -185,7 +210,7 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 			final Iterator<Entry<Key, Value>> result = scanner.iterator();
 
 			return new RecordIterator<KeyValueEntry>() {
-
+			    
 				boolean reachedLimit = false;
 				StaticBuffer key;
 				StaticBuffer value;
@@ -200,10 +225,19 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 							return false;
 
 						Entry<Key, Value> entry = result.next();
-						key = new StaticByteBuffer(entry.getKey().toString()
-								.getBytes());
-						value = new StaticByteBuffer(entry.getValue()
-								.toString().getBytes());
+						
+						
+						key = new StaticByteBuffer(entry.getKey().getRow().toString()
+									   .getBytes());
+						
+						value = new StaticByteBuffer(entry.getKey().toString()
+									     .getBytes());
+
+						System.out.println("Key = "+entry.getKey().getRow().toString());
+						System.out.println("Valuey = "+ entry.getValue().toString());
+						
+						
+
 
 						if (selector.include(key)) {
 							reachedLimit = selector.reachedLimit();
@@ -249,10 +283,17 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
-			String startKey = new String(key.asByteBuffer().array(),
+		    /*
+ 			String startKey = new String(key.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
 			String startValue = new String(value.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
+		    */
+
+		    String startKey = new String(key.asByteBuffer().array());
+		    String startValue = new String(value.asByteBuffer().array());
+
+
 
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
@@ -266,7 +307,8 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 			Mutation m = new Mutation(new Text(startKey));
 			m.put(cf, cq, cv,
-					new Value(startValue.getBytes(Charset.forName("UTF-8"))));
+					new Value(startValue.getBytes()));
+			//					new Value(startValue.getBytes(Charset.forName("UTF-8"))));
 			writer.addMutation(m);
 			writer.close();
 
@@ -293,9 +335,12 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
+		    /*
 			String startKey = new String(key.asByteBuffer().array(),
 					Charset.forName("UTF-8"));
-
+		    */
+		    String startKey = new String(key.asByteBuffer().array());
+		    
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 

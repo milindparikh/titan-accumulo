@@ -24,7 +24,7 @@ public class AccumuloStoreDriver {
 		BaseConfiguration storeConfig = new BaseConfiguration();
 
 		storeConfig.addProperty("zookeepers", "localhost:2181");
-		storeConfig.addProperty("instance", "graph");
+		storeConfig.addProperty("instance", "test");
 		storeConfig.addProperty("user", "root");
 		storeConfig.addProperty("password", "root");
 
