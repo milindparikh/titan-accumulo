@@ -1,6 +1,5 @@
 package milindparikh.diskstorage.accumulo.java;
 
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -33,7 +32,9 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 		OrderedKeyValueStore {
 	private final AccumuloJavaStoreManager storeManager;
 	private String tableName;
-
+	private final String columnFamilyName = "titan-cf";
+	private final String columnFamilyQualifier = "titan-cq";
+	
 	AccumuloJavaOrderedKeyColumnValueStore(String tableName,
 			AccumuloJavaStoreManager storeManager) {
 		this.storeManager = storeManager;
@@ -43,8 +44,6 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 	@Override
 	public String getName() {
-		System.out.println("Calling getName on " + tableName);
-
 		return tableName;
 	}
 
@@ -61,26 +60,18 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 		AccumuloConnector accumuloConnector = null;
 
 		try {
-
-			/*
-			 * String startKey = new String(key.asByteBuffer().array(),
-			 * Charset.forName("UTF-8"));
-			 */
-			String startKey = new String(key.asByteBuffer().array());
-			System.out.println("Calling get with " + tableName + "(" + startKey
-					+ ")");
-
+			
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 			Scanner scanner = connector.createScanner(tableName,
 					accumuloConnector.auths);
 
-			Key start = null;
-			if (startKey != null)
-				start = new Key(new Text(startKey));
+			Key startK = null;
+			if (key != null)
+				startK = new Key(new Text(key.asByteBuffer().array()));
 			Key end = null;
 
-			scanner.setRange(new Range(start, end));
+			scanner.setRange(new Range(startK, end));
 			Iterator<Entry<Key, Value>> iter = scanner.iterator();
 
 			if (iter.hasNext()) {
@@ -113,23 +104,18 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 		AccumuloConnector accumuloConnector = null;
 
 		try {
-			/*
-			 * String startKey = new String(key.asByteBuffer().array(),
-			 * Charset.forName("UTF-8"));
-			 */
-			String startKey = new String(key.asByteBuffer().array());
-
+			
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 			Scanner scanner = connector.createScanner(tableName,
 					accumuloConnector.auths);
 
-			Key start = null;
-			if (startKey != null)
-				start = new Key(new Text(startKey));
+			Key startK = null;
+			if (key != null)
+				startK = new Key(new Text(key.asByteBuffer().array()));
 			Key end = null;
 
-			scanner.setRange(new Range(start, end));
+			scanner.setRange(new Range(startK, end));
 			Iterator<Entry<Key, Value>> iter = scanner.iterator();
 			if (iter.hasNext()) {
 				retValue = true;
@@ -175,14 +161,7 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
-			/*
-			 * String startKey = new String(keyStart.asByteBuffer().array(),
-			 * Charset.forName("UTF-8")); String endKey = new
-			 * String(keyEnd.asByteBuffer().array(), Charset.forName("UTF-8"));
-			 */
-
 			String startKey = new String(keyStart.asByteBuffer().array());
-			System.out.println("Slicing table " + tableName);
 			String endKey = new String(keyEnd.asByteBuffer().array());
 
 			accumuloConnector = storeManager.getAccumuloConnector();
@@ -192,10 +171,10 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 			Key startK = null;
 			if (startKey != null)
-				startK = new Key(new Text(startKey));
+				startK = new Key(new Text(keyStart.asByteBuffer().array()));
 			Key endK = null;
 			if (endKey != null)
-				endK = new Key(new Text(endKey));
+				endK = new Key(new Text(keyEnd.asByteBuffer().array()));
 
 			scanner.setRange(new Range(startK, endK));
 			final Iterator<Entry<Key, Value>> result = scanner.iterator();
@@ -218,12 +197,12 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 								return false;
 
 							Entry<Key, Value> entry = result.next();
-							key = new StaticByteBuffer(entry.getKey().getRow()
-									.toString().getBytes());
-							value = new StaticByteBuffer(entry.getValue()
-									.toString().getBytes());
-							if (selector.include(key)) {
-								System.out.println("Entered if condition");
+							
+							key = new StaticByteBuffer(entry.getKey()
+									.getRow().getBytes());
+							value = new StaticByteBuffer(entry.getValue().get());
+							
+					if (selector.include(key)) {
 								reachedLimit = selector.reachedLimit();
 								kve = new KeyValueEntry(key, value);
 								doValidate = false;
@@ -239,6 +218,9 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 				@Override
 				public KeyValueEntry next() {
+					if(kve == null){
+						hasNext();
+					}
 					doValidate = true;
 					return kve;
 				}
@@ -272,29 +254,18 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
-			/*
-			 * String startKey = new String(key.asByteBuffer().array(),
-			 * Charset.forName("UTF-8")); String startValue = new
-			 * String(value.asByteBuffer().array(), Charset.forName("UTF-8"));
-			 */
-
-			String startKey = new String(key.asByteBuffer().array());
-			String startValue = new String(value.asByteBuffer().array());
-
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 
 			BatchWriter writer = connector.createBatchWriter(tableName,
 					new BatchWriterConfig());
-			System.out.println("######################################");
-			System.out.println("Insert into tablename->" + tableName);
+			
 			
 			ColumnVisibility cv = new ColumnVisibility();
-			Text cf = new Text("datatypes");
-			Text cq = new Text("xml");
-
-			Mutation m = new Mutation(new Text(startKey));
-			m.put(cf, cq, cv, new Value(startValue.getBytes()));
+			Text cf = new Text(columnFamilyName);
+			Text cq = new Text(columnFamilyQualifier);
+			Mutation m = new Mutation(new Text(key.asByteBuffer().array()));
+			m.put(cf, cq, cv, new Value(value.asByteBuffer().array()));
 			// new Value(startValue.getBytes(Charset.forName("UTF-8"))));
 			writer.addMutation(m);
 			writer.close();
@@ -322,12 +293,6 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 
 		try {
 
-			/*
-			 * String startKey = new String(key.asByteBuffer().array(),
-			 * Charset.forName("UTF-8"));
-			 */
-			String startKey = new String(key.asByteBuffer().array());
-
 			accumuloConnector = storeManager.getAccumuloConnector();
 			Connector connector = accumuloConnector.getConnector();
 
@@ -335,10 +300,10 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 					new BatchWriterConfig());
 
 			ColumnVisibility cv = new ColumnVisibility();
-			Text cf = new Text("datatypes");
-			Text cq = new Text("xml");
+			Text cf = new Text(columnFamilyName);
+			Text cq = new Text(columnFamilyQualifier);
 
-			Mutation m = new Mutation(new Text(startKey));
+			Mutation m = new Mutation(new Text(key.asByteBuffer().array()));
 			m.putDelete(cf, cq, cv);
 			writer.addMutation(m);
 			writer.close();
@@ -358,5 +323,4 @@ public class AccumuloJavaOrderedKeyColumnValueStore implements
 		storeManager.returnAccumuloConnector(accumuloConnector);
 
 	}
-
 }
